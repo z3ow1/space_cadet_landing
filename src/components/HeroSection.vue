@@ -300,20 +300,13 @@ const debrisStyle = (p) => ({
   color: #ffffff;
 }
 
-@supports (-webkit-background-clip: text) or (background-clip: text) {
-  .hero-title {
-    background: linear-gradient(90deg, #ffffff 0%, var(--accent-bright) 30%, var(--glow) 60%, var(--accent-bright) 80%, #ffffff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    background-size: 200% auto;
-    animation: gradient-shift 6s linear infinite;
-  }
-}
-
 .title-letter {
   display: inline-block;
   animation: letter-reveal 0.5s ease both;
+  background: linear-gradient(90deg, #ffffff 0%, var(--accent-bright) 40%, var(--glow) 70%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-tagline {
