@@ -8,21 +8,8 @@ export function useSecurity() {
   }
 
   if (navigator.webdriver) {
-    document.documentElement.innerHTML = ''
+    document.body.style.display = 'none'
     return
-  }
-
-  const DEVTOOLS_THRESHOLD = 160
-
-  const detectDevTools = () => {
-    if (
-      window.outerWidth - window.innerWidth > DEVTOOLS_THRESHOLD ||
-      window.outerHeight - window.innerHeight > DEVTOOLS_THRESHOLD
-    ) {
-      document.body.style.display = 'none'
-    } else {
-      document.body.style.display = ''
-    }
   }
 
   const onKeydown = (e) => {
@@ -33,17 +20,13 @@ export function useSecurity() {
 
   const onContextMenu = (e) => e.preventDefault()
 
-  let timer
-
   onMounted(() => {
     document.addEventListener('keydown', onKeydown)
     document.addEventListener('contextmenu', onContextMenu)
-    timer = setInterval(detectDevTools, 800)
   })
 
   onUnmounted(() => {
     document.removeEventListener('keydown', onKeydown)
     document.removeEventListener('contextmenu', onContextMenu)
-    clearInterval(timer)
   })
 }

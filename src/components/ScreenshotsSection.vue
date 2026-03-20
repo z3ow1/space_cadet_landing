@@ -37,6 +37,14 @@ const onKeydown = (e) => {
   if (e.key === 'ArrowRight') nextSlide()
 }
 
+let touchStartX = 0
+const onTouchStart = (e) => { touchStartX = e.touches[0].clientX }
+const onTouchEnd = (e) => {
+  const delta = e.changedTouches[0].clientX - touchStartX
+  if (delta < -50) nextSlide()
+  if (delta > 50) prevSlide()
+}
+
 onMounted(() => document.addEventListener('keydown', onKeydown))
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
@@ -97,6 +105,8 @@ onUnmounted(() => {
         role="dialog"
         aria-modal="true"
         @click.self="closeLightbox"
+        @touchstart.passive="onTouchStart"
+        @touchend.passive="onTouchEnd"
       >
         <button class="lightbox-close" @click="closeLightbox" :aria-label="t.screenshots.close">✕</button>
 

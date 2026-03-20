@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed, watchEffect, provide } from 'vue'
-import { LOCALES, DEFAULT_LOCALE } from './constants/i18n.js'
+import { ref, computed, watch, watchEffect, provide } from 'vue'
+import { LOCALES, DEFAULT_LOCALE, LOCALE_KEYS } from './constants/i18n.js'
 import { useSecurity } from './composables/useSecurity.js'
 
 useSecurity()
@@ -13,9 +13,11 @@ import ScreenshotsSection from './components/ScreenshotsSection.vue'
 import BetaSection from './components/BetaSection.vue'
 import FooterSection from './components/FooterSection.vue'
 
-const locale = ref(DEFAULT_LOCALE)
+const saved = localStorage.getItem('scm_locale')
+const locale = ref(LOCALE_KEYS.includes(saved) ? saved : DEFAULT_LOCALE)
 const t = computed(() => LOCALES[locale.value])
 const setLocale = (key) => { locale.value = key }
+watch(locale, (val) => localStorage.setItem('scm_locale', val))
 const interpolate = (str, vars) => str.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''))
 
 const announcementVisible = ref(true)
@@ -31,8 +33,11 @@ provide('setAnnouncementVisible', setAnnouncementVisible)
 watchEffect(() => {
   document.documentElement.lang = locale.value
   document.title = t.value.meta.title
-  const descEl = document.querySelector('meta[name="description"]')
-  if (descEl) descEl.setAttribute('content', t.value.meta.description)
+  document.querySelector('meta[name="description"]')?.setAttribute('content', t.value.meta.description)
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content', t.value.meta.title)
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content', t.value.meta.description)
+  document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', t.value.meta.title)
+  document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', t.value.meta.description)
 })
 
 </script>

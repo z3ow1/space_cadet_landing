@@ -10,11 +10,14 @@ const t = inject('t')
 const setLocale = inject('setLocale')
 
 const dropdownOpen = ref(false)
+const menuOpen = ref(false)
 const scrolled = ref(false)
 const progress = ref(0)
 const navRef = ref(null)
 
 const toggleDropdown = () => { dropdownOpen.value = !dropdownOpen.value }
+const toggleMenu = () => { menuOpen.value = !menuOpen.value }
+const closeMenu = () => { menuOpen.value = false }
 
 const selectLocale = (key) => {
   setLocale(key)
@@ -25,11 +28,13 @@ const onScroll = () => {
   scrolled.value = window.scrollY > 50
   const max = document.documentElement.scrollHeight - window.innerHeight
   progress.value = max > 0 ? (window.scrollY / max) * 100 : 0
+  if (menuOpen.value) menuOpen.value = false
 }
 
 const onClickOutside = (e) => {
   if (navRef.value && !navRef.value.contains(e.target)) {
     dropdownOpen.value = false
+    menuOpen.value = false
   }
 }
 
@@ -63,10 +68,10 @@ onUnmounted(() => {
         <span class="brand-name">Space Cadet Mining</span>
       </div>
 
-      <div class="nav-links">
-        <a href="#features" :class="{ active: activeSection === 'features' }">{{ t.nav.features }}</a>
-        <a href="#screenshots" :class="{ active: activeSection === 'screenshots' }">{{ t.nav.screenshots }}</a>
-        <a href="#beta" :class="{ active: activeSection === 'beta' }">{{ t.nav.beta }}</a>
+      <div :class="['nav-links', { open: menuOpen }]">
+        <a href="#features" :class="{ active: activeSection === 'features' }" @click="closeMenu">{{ t.nav.features }}</a>
+        <a href="#screenshots" :class="{ active: activeSection === 'screenshots' }" @click="closeMenu">{{ t.nav.screenshots }}</a>
+        <a href="#beta" :class="{ active: activeSection === 'beta' }" @click="closeMenu">{{ t.nav.beta }}</a>
       </div>
 
       <div class="nav-actions">
@@ -89,6 +94,10 @@ onUnmounted(() => {
         <a :href="DOWNLOAD_URL" class="btn-download btn-download-sm" download>
           {{ t.nav.download }}
         </a>
+
+        <button class="nav-burger" @click.stop="toggleMenu" :aria-expanded="menuOpen" :aria-label="menuOpen ? 'Cerrar menú' : 'Abrir menú'">
+          <span class="burger-icon">{{ menuOpen ? '✕' : '☰' }}</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -268,8 +277,57 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .nav-links { display: none; }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 16px 16px;
+    background: rgba(10, 10, 15, 0.98);
+    border-bottom: 1px solid var(--border-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 12px 8px;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .nav-links a:last-child {
+    border-bottom: none;
+  }
+
+  .nav-burger {
+    display: flex;
+  }
+
   .brand-name { font-size: 0.8rem; }
+}
+
+.nav-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-burger:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
 }
 
 @media (max-width: 480px) {
